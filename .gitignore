@@ -19,3 +19,6 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Allow the template
+!application-prod.yml.template
