@@ -67,10 +67,13 @@ public class JwtUtil {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(
-                java.util.Base64.getEncoder()
-                        .encodeToString(secretKey.getBytes())
-        );
+        byte[] keyBytes = secretKey.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        // Pad key to minimum 32 bytes required for HMAC-SHA256
+        if (keyBytes.length < 32) {
+            byte[] padded = new byte[32];
+            System.arraycopy(keyBytes, 0, padded, 0, keyBytes.length);
+            return Keys.hmacShaKeyFor(padded);
+        }
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

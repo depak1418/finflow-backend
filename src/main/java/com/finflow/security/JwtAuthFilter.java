@@ -22,6 +22,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
 
+//    @Override
+//    protected boolean shouldNotFilter(@Nonnull HttpServletRequest request) throws ServletException {
+//        String path = request.getRequestURI();
+//        return path.startsWith("/swagger-ui") ||
+//                path.startsWith("/v3/api-docs") ||
+//                path.startsWith("/api-docs") ||
+//                path.startsWith("/api/auth/"); // Exclude your login/register endpoints too!
+//    }
+
     @Override
     protected void doFilterInternal(
             @Nonnull HttpServletRequest request,

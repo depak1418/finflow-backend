@@ -25,4 +25,6 @@ public class DashboardResponse {
 
     // Unread notification count
     private long unreadNotifications;
+
+    private List<TransactionResponse> recentTransactions;
 }

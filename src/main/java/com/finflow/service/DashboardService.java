@@ -2,6 +2,7 @@ package com.finflow.service;
 
 import com.finflow.dto.BudgetResponse;
 import com.finflow.dto.DashboardResponse;
+import com.finflow.dto.TransactionResponse;
 import com.finflow.entity.Transaction;
 import com.finflow.entity.User;
 import com.finflow.repository.*;
@@ -77,7 +78,16 @@ public class DashboardService {
         // Unread notifications count
         long unread = notificationRepository.countByUserIdAndIsReadFalse(userId);
 
+        // Recent 5 transactions for the month
+        List<TransactionResponse> recentTransactions = transactions.stream()
+                .sorted((a, b) -> b.getTransactionDate()
+                        .compareTo(a.getTransactionDate()))
+                .limit(5)
+                .map(TransactionResponse::from)
+                .toList();
+
         return DashboardResponse.builder()
+                .recentTransactions(recentTransactions)
                 .totalIncome(totalIncome)
                 .totalExpense(totalExpense)
                 .balance(totalIncome.subtract(totalExpense))

@@ -1,5 +1,6 @@
 package com.finflow.config;
 
+import org.springframework.http.HttpMethod;
 import com.finflow.security.JwtAuthFilter;
 import com.finflow.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -49,17 +50,21 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints — no token needed
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/api/auth/register",   // ✅ explicit
+                                "/api/auth/login",      // ✅ explicit
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
+                                "/swagger-ui/index.html",
+                                "/api-docs",
                                 "/api-docs/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/v3/api-docs",
+                                "/webjars/**"
                         ).permitAll()
-                        // Admin only
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        // Everything else needs authentication
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -73,13 +78,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // React frontend
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",   // ✅ Vite dev server
+                "http://localhost:3000"    // keep for later
+        ));
+        config.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
